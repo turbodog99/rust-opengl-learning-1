@@ -46,5 +46,3 @@ to let you know it can't statically check them...interesting.
 After using the provided Triangle code, I ended up removing my data.rs and using the
 author's, which necessitated adding a couple of new dependencies. He implemented all of
 the various GL data formats.
-
-I'm now finished the walk through...time to make this do something myself.
