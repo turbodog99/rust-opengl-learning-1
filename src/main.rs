@@ -12,6 +12,13 @@ use render_gl::data;
 use resources::Resources;
 use std::path::Path;
 
+#[derive(Copy, Clone, Debug)]
+#[repr(C, packed)]
+struct Vertex {
+    pos: data::f32_f32_f32,
+    clr: data::f32_f32_f32,
+}
+
 fn main() {
     if let Err(e) = run() {
         println!("{}", failure_to_string(e));
@@ -51,11 +58,19 @@ fn run() -> Result<(), failure::Error> {
 
     shader_program.set_used();
 
-    let vertices: Vec<f32> = vec![
-        // positions      // colors
-        0.5, -0.5, 0.0, 1.0, 0.0, 0.0, // bottom right
-        -0.5, -0.5, 0.0, 0.0, 1.0, 0.0, // bottom left
-        0.0, 0.5, 0.0, 0.0, 0.0, 1.0, // top
+    let vertices: Vec<Vertex> = vec![
+        Vertex {
+            pos: (0.5, -0.5, 0.0).into(),
+            clr: (1.0, 0.0, 0.0).into(),
+        }, // bottom right
+        Vertex {
+            pos: (-0.5, -0.5, 0.0).into(),
+            clr: (0.0, 1.0, 0.0).into(),
+        }, // bottom left
+        Vertex {
+            pos: (0.0, 0.5, 0.0).into(),
+            clr: (0.0, 0.0, 1.0).into(),
+        }, // top
     ];
 
     let mut vbo: gl::types::GLuint = 0;
@@ -66,8 +81,8 @@ fn run() -> Result<(), failure::Error> {
     unsafe {
         gl.BindBuffer(gl::ARRAY_BUFFER, vbo);
         gl.BufferData(
-            gl::ARRAY_BUFFER,                                                       // target
-            (vertices.len() * std::mem::size_of::<f32>()) as gl::types::GLsizeiptr, // size of data in bytes
+            gl::ARRAY_BUFFER,                                                          // target
+            (vertices.len() * std::mem::size_of::<Vertex>()) as gl::types::GLsizeiptr, // size of data in bytes
             vertices.as_ptr() as *const gl::types::GLvoid, // pointer to data
             gl::STATIC_DRAW,                               // usage
         );
