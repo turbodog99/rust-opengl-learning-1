@@ -8,6 +8,7 @@ pub mod render_gl;
 pub mod resources;
 
 use failure::err_msg;
+use render_gl::data;
 use resources::Resources;
 use std::path::Path;
 

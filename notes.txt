@@ -20,3 +20,5 @@ I chose to prepend the variable name with an _ so the compiler would quit compla
 I'm having some issues with local namespacing. Having to use super::whatever to get to a module in a
 source file in the same directory doesn't quite feel right. I might revisit it for further study.
 
+Use the repr macro to take control of the memory layout of a struct.
+
