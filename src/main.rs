@@ -22,7 +22,9 @@ fn main() {
         .build()
         .unwrap();
 
-    let gl_context = window.gl_create_context().unwrap();
+    let _gl_context = window.gl_create_context().unwrap();
+
+    //    let gl_context = window.gl_create_context().unwrap();
     let gl = gl::Gl::load_with(|s| {
         video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void
     });
@@ -31,8 +33,6 @@ fn main() {
         gl.Viewport(0, 0, 900, 700);
         gl.ClearColor(0.3, 0.3, 0.5, 1.0);
     }
-
-    use std::ffi::CString;
 
     let res = Resources::from_relative_exe_path(Path::new("assets")).unwrap();
 

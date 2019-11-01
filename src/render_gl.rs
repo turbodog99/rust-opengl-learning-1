@@ -2,15 +2,34 @@ use gl;
 use std;
 use std::ffi::{CStr, CString};
 
+#[derive(Debug)]
+pub enum Error {
+    ResourceLoad {
+        name: String,
+        inner: super::resources::Error,
+    },
+    CanNotDetermineShaderTypeForResource {
+        name: String,
+    },
+    CompileError {
+        name: String,
+        message: String,
+    },
+    LinkError {
+        name: String,
+        message: String,
+    },
+}
+
 pub struct Shader {
     gl: gl::Gl,
     id: gl::types::GLuint,
 }
 
-use resources::Resources;
+use super::resources::Resources;
 
 impl Shader {
-    pub fn from_res(gl: &gl::Gl, res: &Resources, name: &str) -> Result<Shader, String> {
+    pub fn from_res(gl: &gl::Gl, res: &Resources, name: &str) -> Result<Shader, Error> {
         const POSSIBLE_EXT: [(&str, gl::types::GLenum); 2] =
             [(".vert", gl::VERTEX_SHADER), (".frag", gl::FRAGMENT_SHADER)];
 
@@ -18,13 +37,17 @@ impl Shader {
             .iter()
             .find(|&&(file_extension, _)| name.ends_with(file_extension))
             .map(|&(_, kind)| kind)
-            .ok_or_else(|| format!("Can not determine shader type for resource {}", name))?;
+            .ok_or_else(|| Error::CanNotDetermineShaderTypeForResource { name: name.into() })?;
 
-        let source = res
-            .load_cstring(name)
-            .map_err(|e| format!("Error loading resource {}: {:?}", name, e))?;
+        let source = res.load_cstring(name).map_err(|e| Error::ResourceLoad {
+            name: name.into(),
+            inner: e,
+        })?;
 
-        Shader::from_source(gl, &source, shader_kind)
+        Shader::from_source(gl, &source, shader_kind).map_err(|message| Error::CompileError {
+            name: name.into(),
+            message,
+        })
     }
 
     pub fn from_source(
@@ -103,15 +126,18 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn from_res(gl: &gl::Gl, res: &Resources, name: &str) -> Result<Program, String> {
+    pub fn from_res(gl: &gl::Gl, res: &Resources, name: &str) -> Result<Program, Error> {
         const POSSIBLE_EXT: [&str; 2] = [".vert", ".frag"];
 
         let shaders = POSSIBLE_EXT
             .iter()
             .map(|file_extension| Shader::from_res(gl, res, &format!("{}{}", name, file_extension)))
-            .collect::<Result<Vec<Shader>, String>>()?;
+            .collect::<Result<Vec<Shader>, Error>>()?;
 
-        Program::from_shaders(gl, &shaders[..])
+        Program::from_shaders(gl, &shaders[..]).map_err(|message| Error::LinkError {
+            name: name.into(),
+            message,
+        })
     }
 
     pub fn from_shaders(gl: &gl::Gl, shaders: &[Shader]) -> Result<Program, String> {
