@@ -53,11 +53,6 @@ fn run() -> Result<(), failure::Error> {
     let background_color = render_gl::ColorBuffer::from_color(na::Vector3::new(0.3, 0.3, 0.5));
     background_color.set_used(&gl);
 
-    unsafe {
-        gl.Viewport(0, 0, 900, 700);
-        gl.ClearColor(0.3, 0.3, 0.5, 1.0);
-    }
-
     let res = Resources::from_relative_exe_path(Path::new("assets"))?;
 
     viewport.set_used(&gl);
