@@ -1,4 +1,5 @@
 /target
+/lib/gl/target
 **/*.rs.bk
 */.dll
 /msvc

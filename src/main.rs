@@ -5,21 +5,32 @@ extern crate gl;
 extern crate sdl2;
 #[macro_use]
 extern crate render_gl_derive;
-extern crate nalgebra;
+
+// TODO: I'm keeping this here to remind me to learn to use it.
+// extern crate nalgebra;
 
 pub mod render_gl;
 pub mod resources;
 
 use failure::err_msg;
+use render_gl::Color;
 use resources::Resources;
 use std::path::Path;
 
-use nalgebra as na;
+// See above TODO
+// use nalgebra as na;
 
 mod triangle;
 
 const INIT_WINDOW_WIDTH: u32 = 900;
 const INIT_WINDOW_HEIGHT: u32 = 700;
+
+const BACKGROUND_COLOR: Color = Color {
+    red: 0.3,
+    green: 0.3,
+    blue: 0.8,
+    alpha: 1.0,
+};
 
 fn main() {
     if let Err(e) = run() {
@@ -31,8 +42,6 @@ fn run() -> Result<(), failure::Error> {
     let sdl = sdl2::init().map_err(err_msg)?;
     let video_subsystem = sdl.video().unwrap();
     let gl_attr = video_subsystem.gl_attr();
-    let mut viewport =
-        render_gl::Viewport::for_window(INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
 
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     gl_attr.set_context_version(4, 5);
@@ -50,12 +59,11 @@ fn run() -> Result<(), failure::Error> {
         video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void
     });
 
-    let background_color = render_gl::ColorBuffer::from_color(na::Vector3::new(0.3, 0.3, 0.5));
-    background_color.set_used(&gl);
-
     let res = Resources::from_relative_exe_path(Path::new("assets"))?;
 
-    viewport.set_used(&gl);
+    unsafe {
+        gl.Viewport(0, 0, INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
+    }
 
     let mut event_pump = sdl.event_pump().unwrap();
     'main: loop {
@@ -64,17 +72,24 @@ fn run() -> Result<(), failure::Error> {
             match event {
                 sdl2::event::Event::Quit { .. } => break 'main,
                 sdl2::event::Event::Window {
-                    win_event: sdl2::event::WindowEvent::Resized(w, h),
+                    win_event: sdl2::event::WindowEvent::Resized(width, height),
                     ..
-                } => {
-                    viewport.update_size(w, h);
-                    viewport.set_used(&gl);
-                }
+                } => unsafe {
+                    gl.Viewport(0, 0, width as i32, height as i32);
+                },
                 _ => {}
             }
         }
 
-        background_color.clear(&gl);
+        unsafe {
+            gl.ClearColor(
+                BACKGROUND_COLOR.red,
+                BACKGROUND_COLOR.green,
+                BACKGROUND_COLOR.blue,
+                BACKGROUND_COLOR.alpha,
+            );
+            gl.Clear(gl::COLOR_BUFFER_BIT);
+        }
 
         let triangle = triangle::Triangle::new(&res, &gl)?;
         triangle.render(&gl);
