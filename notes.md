@@ -25,7 +25,7 @@ the author discusses why he chose to make the wrapping function safe but the fun
 that call the unsafe GL functions unsafe. It seems very indicative of the Rust
 philosophy.
 
-Procedural macros seem like a really slick idea. They let generate code at compile time to handle multiple types.
+Procedural macros seem like a really slick idea. They let me generate code at compile time to handle multiple types.
 
 For now, I stuck with putting the shaders in an assets directory. The author of the post I've been following seems to have moved shaders into the root directory at some point.
 
