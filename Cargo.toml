@@ -17,7 +17,7 @@ failure = "0.1"
 render_gl_derive = { path = "render_gl_derive" }
 half = "1.1.1"
 vec-2-10-10-10 = "0.1.2"
-# nalgebra = "0.16"
+nalgebra = "0.16"
 
 [features]
 gl_debug = ["gl/debug"]

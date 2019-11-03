@@ -4,6 +4,10 @@ use gl;
 use crate::render_gl::{self, buffer, data};
 use crate::resources::Resources;
 
+extern crate nalgebra;
+use nalgebra as na;
+use std::ffi::CString;
+
 #[derive(VertexAttribPointers, Copy, Clone, Debug)]
 #[repr(C, packed)]
 struct Vertex {
@@ -64,11 +68,21 @@ impl Triangle {
     })
   }
 
-  pub fn render(&self, gl: &gl::Gl) {
+  pub fn render(&self, gl: &gl::Gl, transform_matrix: na::Matrix4<f32>) {
     self.program.set_used();
     self.vao.bind();
 
+    let uniform_transform_name = CString::new("transform").expect("CString::new failed");
+
     unsafe {
+      let transform_loc = gl.GetUniformLocation(self.program.id(), uniform_transform_name.as_ptr());
+      gl.UniformMatrix4fv(
+        transform_loc,
+        1,
+        gl::FALSE,
+        transform_matrix.as_slice().as_ptr(),
+      );
+
       gl.DrawArrays(
         gl::TRIANGLES, // mode
         0,             // starting index in the enabled arrays

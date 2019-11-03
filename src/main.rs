@@ -5,9 +5,7 @@ extern crate gl;
 extern crate sdl2;
 #[macro_use]
 extern crate render_gl_derive;
-
-// TODO: I'm keeping this here to remind me to learn to use it.
-// extern crate nalgebra;
+extern crate nalgebra;
 
 pub mod render_gl;
 pub mod resources;
@@ -17,9 +15,7 @@ use render_gl::Color;
 use resources::Resources;
 use std::path::Path;
 
-// See above TODO
-// use nalgebra as na;
-
+use nalgebra as na;
 mod triangle;
 
 const INIT_WINDOW_WIDTH: u32 = 900;
@@ -65,6 +61,8 @@ fn run() -> Result<(), failure::Error> {
         gl.Viewport(0, 0, INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
     }
 
+    let transform_matrix: na::Matrix4<f32> = na::Matrix4::identity();
+
     let mut event_pump = sdl.event_pump().unwrap();
     'main: loop {
         for event in event_pump.poll_iter() {
@@ -92,7 +90,7 @@ fn run() -> Result<(), failure::Error> {
         }
 
         let triangle = triangle::Triangle::new(&res, &gl)?;
-        triangle.render(&gl);
+        triangle.render(&gl, transform_matrix);
 
         window.gl_swap_window();
     }
