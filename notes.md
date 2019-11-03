@@ -7,15 +7,13 @@ Build dependencies are separate. I slipped up on this initially and put the walk
 build script needs, in the dependencies section.
 
 The example code had me create a variable called gl_context. In C, you'd normally save the
-context so that you can delete it later with SDL_GL_DeleteContext(gl_context). I was getting compiler
-errors about never using the gl_context variable. I temporarily deleted the line that creates it and
-stuff broke. Then, I tried not saving the variable since it wasn't used. Stuff was still broken.
+context so that you can delete it later with SDL_GL_DeleteContext(gl_context). I was getting compiler errors about never using the gl_context variable. I tried not saving the variable since it wasn't used. Stuff broke.
 
 Coming from other languages, I had this instinct to ask, "why would I save this if I don't use it?"
 Well, it turns out having the variable there unused established its lifetime so the context could be
 cleaned up automatically when I was done with it.
 
-I chose to prepend the variable name with an _ so the compiler would quit complaining about it.
+I chose to prepend the variable name with an \_ so the compiler would quit complaining about it.
 
 I'm having some issues with local namespacing. Having to use super::whatever to get to a module in a
 source file in the same directory doesn't quite feel right. I might revisit it for further study.
@@ -35,7 +33,7 @@ It's apparently not possible to create a generic structure that doesn't actually
 contain the generic data type. So, there's a ::std::marker::PhantomData<type> object
 that acts as a placeholder but is zero-sized so is no cost.
 
-_marker: ::std::marker::PhantomData<B>
+\_marker: ::std::marker::PhantomData<B>
 
 The refactor of ArrayBuffer into a generic Buffer Struct got us ElementArrayBuffers
 nearly for free.
