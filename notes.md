@@ -93,6 +93,4 @@ red, green, blue, and alpha fields. I'm removing the Viewport object altogether
 and just going with the OpenGL versions.
 
 My problem with writing too many wrappers is that I find if I get too disconnected
-from what I'm wrapping, I'm not learning the wrapped library. I don't gain much knowledge
-of the wrapped library, and maintaining the wrapper tends to be a pain as well. So,
-I try to wrap sparingly.
+from what I'm wrapping, I'm not learning the wrapped library and maintaining the wrapper tends to be a pain as well. So, I try to wrap sparingly.
