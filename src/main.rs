@@ -62,13 +62,43 @@ fn run() -> Result<(), failure::Error> {
     }
 
     let identity_matrix: na::Matrix4<f32> = na::Matrix4::identity();
-    let translate_vector: na::Vector3<f32> = na::Vector3::new(0.2, 0.0, 0.0);
-    let transform_matrix: na::Matrix4<f32> = identity_matrix.append_translation(&translate_vector);
+    let mut translate_vector: na::Vector3<f32> = na::Vector3::new(0.0, 0.0, 0.0);
+    let mut transform_matrix: na::Matrix4<f32>;
 
     let mut event_pump = sdl.event_pump().unwrap();
+
     'main: loop {
+        if event_pump
+            .keyboard_state()
+            .is_scancode_pressed(sdl2::keyboard::Scancode::A)
+        {
+            translate_vector.x -= 0.001;
+        }
+
+        if event_pump
+            .keyboard_state()
+            .is_scancode_pressed(sdl2::keyboard::Scancode::S)
+        {
+            translate_vector.y -= 0.001;
+        }
+
+        if event_pump
+            .keyboard_state()
+            .is_scancode_pressed(sdl2::keyboard::Scancode::W)
+        {
+            translate_vector.y += 0.001;
+        }
+
+        if event_pump
+            .keyboard_state()
+            .is_scancode_pressed(sdl2::keyboard::Scancode::D)
+        {
+            translate_vector.x += 0.001;
+        }
+
+        transform_matrix = identity_matrix.append_translation(&translate_vector);
+
         for event in event_pump.poll_iter() {
-            // handle user input here
             match event {
                 sdl2::event::Event::Quit { .. } => break 'main,
                 sdl2::event::Event::Window {
