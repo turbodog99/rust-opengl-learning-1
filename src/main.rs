@@ -34,9 +34,6 @@ fn run() -> Result<(), failure::Error> {
     let mut viewport =
         render_gl::Viewport::for_window(INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
 
-    let background_color = render_gl::ColorBuffer::from_color(na::Vector3::new(0.3, 0.3, 0.5));
-    background_color.set_used(&gl);
-
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     gl_attr.set_context_version(4, 5);
 
@@ -53,6 +50,9 @@ fn run() -> Result<(), failure::Error> {
     let gl = gl::Gl::load_with(|s| {
         video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void
     });
+
+    let background_color = render_gl::ColorBuffer::from_color(na::Vector3::new(0.3, 0.3, 0.5));
+    background_color.set_used(&gl);
 
     unsafe {
         gl.Viewport(0, 0, 900, 700);
