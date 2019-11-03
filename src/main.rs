@@ -5,6 +5,7 @@ extern crate gl;
 extern crate sdl2;
 #[macro_use]
 extern crate render_gl_derive;
+extern crate nalgebra;
 
 pub mod render_gl;
 pub mod resources;
@@ -12,6 +13,8 @@ pub mod resources;
 use failure::err_msg;
 use resources::Resources;
 use std::path::Path;
+
+use nalgebra as na;
 
 mod triangle;
 
@@ -30,6 +33,9 @@ fn run() -> Result<(), failure::Error> {
     let gl_attr = video_subsystem.gl_attr();
     let mut viewport =
         render_gl::Viewport::for_window(INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
+
+    let background_color = render_gl::ColorBuffer::from_color(na::Vector3::new(0.3, 0.3, 0.5));
+    background_color.set_used(&gl);
 
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     gl_attr.set_context_version(4, 5);
@@ -74,9 +80,7 @@ fn run() -> Result<(), failure::Error> {
             }
         }
 
-        unsafe {
-            gl.Clear(gl::COLOR_BUFFER_BIT);
-        }
+        background_color.clear(&gl);
 
         let triangle = triangle::Triangle::new(&res, &gl)?;
         triangle.render(&gl);
