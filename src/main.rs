@@ -61,7 +61,9 @@ fn run() -> Result<(), failure::Error> {
         gl.Viewport(0, 0, INIT_WINDOW_WIDTH as i32, INIT_WINDOW_HEIGHT as i32);
     }
 
-    let transform_matrix: na::Matrix4<f32> = na::Matrix4::identity();
+    let identity_matrix: na::Matrix4<f32> = na::Matrix4::identity();
+    let translate_vector: na::Vector3<f32> = na::Vector3::new(0.2, 0.0, 0.0);
+    let transform_matrix: na::Matrix4<f32> = identity_matrix.append_translation(&translate_vector);
 
     let mut event_pump = sdl.event_pump().unwrap();
     'main: loop {
