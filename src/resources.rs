@@ -19,18 +19,25 @@ impl From<io::Error> for Error {
   }
 }
 
+trait ExePaths {
+  fn exe_path() -> Result<PathBuf, Error>;
+
+  fn relative_exe_path(rel_path: &Path) -> Result<PathBuf, Error> {
+    let exe_path = Self::exe_path()?;
+    let exe_dir = exe_path.parent().unwrap();
+    let full_path = exe_dir.join(rel_path);
+    Ok(full_path)
+  }
+}
+
 pub struct Resources {
   root_path: PathBuf,
 }
 
 impl Resources {
   pub fn from_relative_exe_path(rel_path: &Path) -> Result<Resources, Error> {
-    let exe_file_name = ::std::env::current_exe().map_err(|_| Error::FailedToGetExePath)?;
-
-    let exe_path = exe_file_name.parent().ok_or(Error::FailedToGetExePath)?;
-
     Ok(Resources {
-      root_path: exe_path.join(rel_path),
+      root_path: Self::relative_exe_path(rel_path).unwrap(),
     })
   }
 
@@ -50,6 +57,12 @@ impl Resources {
   }
 }
 
+impl ExePaths for Resources {
+  fn exe_path() -> Result<PathBuf, Error> {
+    ::std::env::current_exe().map_err(|_| Error::FailedToGetExePath)
+  }
+}
+
 fn resource_name_to_path(root_dir: &Path, location: &str) -> PathBuf {
   let mut path: PathBuf = root_dir.into();
 
@@ -58,4 +71,25 @@ fn resource_name_to_path(root_dir: &Path, location: &str) -> PathBuf {
   }
 
   path
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  struct ExePathsTest {}
+
+  impl ExePaths for ExePathsTest {
+    fn exe_path() -> Result<PathBuf, Error> {
+      Ok(Path::new("/test/test.exe").to_path_buf())
+    }
+  }
+
+  #[test]
+  fn relative_exe_path_test() {
+    assert_eq!(
+      ExePathsTest::relative_exe_path(Path::new("assets")).unwrap(),
+      Path::new("/test/assets").to_path_buf()
+    );
+  }
 }

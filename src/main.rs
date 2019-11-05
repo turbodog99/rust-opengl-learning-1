@@ -18,6 +18,8 @@ use std::path::Path;
 use nalgebra as na;
 mod triangle;
 
+// extern crate tobj;
+
 const INIT_WINDOW_WIDTH: u32 = 900;
 const INIT_WINDOW_HEIGHT: u32 = 700;
 
